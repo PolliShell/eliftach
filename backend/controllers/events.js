@@ -4,9 +4,22 @@ const { EventRegistration } = require("../models/eventRegistration");
 const { HttpError } = require("../helpers");
 
 const getAllEvents = async (req, res) => {
-    const events = await Event.find();
-    res.json(events);
+    const { page = 1, pageSize = 10 } = req.query;
+    const skip = (page - 1) * pageSize;
+
+    try {
+        const totalCount = await Event.countDocuments();
+        const events = await Event.find().skip(skip).limit(Number(pageSize));
+
+        const totalPages = Math.ceil(totalCount / pageSize);
+
+        res.json({ events, totalPages });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
 };
+
 
 const getEventById = async (req, res) => {
     const { id } = req.params;

@@ -57,34 +57,36 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-    const {email, password} = req.body;
+    const { username, password } = req.body;
 
-    console.log(req.body)
-    const user = await User.findOne({email});
+    try {
+        // Поиск пользователя в базе данных по имени пользователя (или email, если вы используете его)
+        const user = await User.findOne({ username });
 
+        if (!user) {
+            throw new HttpError(401, "Username or password invalid");
+        }
 
+        // Сравнение введенного пароля с хэшированным паролем в базе данных
+        const passwordCompare = await bcrypt.compare(password, user.password);
 
+        if (!passwordCompare) {
+            throw new HttpError(401, "Username or password invalid");
+        }
 
-    if (!user) {
-        throw HttpError(401, "Email or password invalid");
+        // Создание JWT токена с payload содержащим id пользователя
+        const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "23h" });
+
+        // Обновление токена пользователя в базе данных
+        await User.findByIdAndUpdate(user._id, { token });
+
+        // Отправка токена как ответа на успешную аутентификацию
+        res.json({ token });
+    } catch (error) {
+        // Обработка ошибок
+        console.error("Error during login:", error);
+        res.status(error.status || 500).json({ message: error.message || "Server error" });
     }
-    const passwordCompare = await bcrypt.compare(password, user.password);
-    if (!passwordCompare) {
-        throw HttpError(401, "Email or password invalid");
-    }
-
-    const payload = {
-        id: user._id,
-    }
-
-    const token = jwt.sign(payload, SECRET_KEY, {expiresIn: "23h"});
-    await User.findByIdAndUpdate(user._id, {token});
-
-
-
-    res.json({
-        token,
-    })
 }
 
 const getCurrent = async (req, res) => {

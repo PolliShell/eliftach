@@ -15,7 +15,7 @@ const EventsList = () => {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/events?page=${page}&pageSize=${pageSize}`);
+            const response = await axios.get(`http://localhost:3000/api/event?page=${page}&pageSize=${pageSize}`);
             const { events, totalPages } = response.data;
             setEvents(events);
             setTotalPages(totalPages);

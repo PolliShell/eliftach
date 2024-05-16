@@ -6,7 +6,7 @@ const { validateBody, upload, authenticate } = require("../../middlewares");
 const { registerSchema, loginSchema } = require("../../models/user");
 const path = require("path");
 
-router.post("/register", validateBody(registerSchema), ctrl.register);
+router.post("/register", ctrl.register);
 router.post("/login", ctrl.login); // Fix: Use the login function directly
 router.get("/current", authenticate, ctrl.getCurrent);
 router.post("/logout", authenticate, ctrl.logout);

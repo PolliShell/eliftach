@@ -2,10 +2,9 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser"); // Import body-parser
-require("dotenv").config();
-
 const authRouter = require("./routes/api/auth");
 const eventRouter = require("./routes/api/events");
+require("dotenv").config();
 
 const app = express();
 

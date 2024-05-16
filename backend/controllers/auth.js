@@ -4,36 +4,16 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 const { HttpError, ctrlWrapper } = require("../helpers");
 const { nanoid } = require("nanoid");
+const dotenv = require("dotenv");
+dotenv.config();
 const { SECRET_KEY } = process.env;
 
-// const register = async (req, res) => {
-//     const { full_name, email,birth_date, password } = req.body;
-//     const user = await User.findOne({ email });
-//
-//     if (user) {
-//         throw HttpError(409, "Email already in use");
-//     }
-//
-//     const verificationToken = nanoid();
-//     const hashPassword = await bcrypt.hash(password, 10);
-//
-//     const newUser = await User.create({ full_name, email,birth_date, passhash: hashPassword, verificationToken });
-//
-//     // Sending email verification code can be added here
-//
-//     res.status(201).json({
-//         full_name,
-//         email,
-//         verificationToken
-//     });
-// };
-
 const register = async (req, res) => {
-  const { full_name, email, birth_date, password } = req.body; // Заменяем "name" на "full_name"
+  const { full_name, email, birth_date, password } = req.body;
   const user = await User.findOne({ email });
 
   if (user) {
-    throw HttpError(409, "Email already in use");
+    throw HttpError(409, "Email is already in use");
   }
 
   const verificationToken = nanoid();
@@ -45,43 +25,37 @@ const register = async (req, res) => {
     password: hashPassword,
     birth_date,
     verificationToken,
-  }); // Заменяем "name" на "full_name"
-
-  const mail = {
-    to: email,
-    subject: "Подтверждение email",
-    html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${verificationToken}">Подтвердить email</a>`,
-  };
-
-  res.status(201).json({
-    full_name, // Заменяем "name" на "full_name"
-    email,
-    birth_date,
-    verificationToken,
   });
+
+  const token = jwt.sign({ id: newUser._id }, SECRET_KEY, { expiresIn: "23h" });
+  await User.findByIdAndUpdate(newUser._id, { token });
+
+  // const mail = {
+  //   to: email,
+  //   subject: "Подтверждение email",
+  //   html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${verificationToken}">Подтвердить email</a>`,
+  // };
+
+  res.status(201).json({ token });
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     // Поиск пользователя в базе данных по имени пользователя (или email, если вы используете его)
-    const user = await User.findOne({ username });
-
+    const user = await User.findOne({ email });
     if (!user) {
       throw new HttpError(401, "Username or password invalid");
     }
 
     // Сравнение введенного пароля с хэшированным паролем в базе данных
-    const passwordCompare = await bcrypt.compare(password, user.password);
-
+    const passwordCompare = bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       throw new HttpError(401, "Username or password invalid");
     }
-
     // Создание JWT токена с payload содержащим id пользователя
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "23h" });
-
     // Обновление токена пользователя в базе данных
     await User.findByIdAndUpdate(user._id, { token });
 
@@ -89,7 +63,7 @@ const login = async (req, res) => {
     res.json({ token });
   } catch (error) {
     // Обработка ошибок
-    console.error("Error during login:", error);
+    console.error(error);
     res
       .status(error.status || 500)
       .json({ message: error.message || "Server error" });

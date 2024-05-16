@@ -123,49 +123,20 @@ const registerForEvent = async (req, res) => {
   res.status(201).json(registration);
 };
 
-const findParticipantByEmailForEvent = async (req, res) => {
+const findParticipantForEvent = async (req, res) => {
   const { eventId } = req.params;
-  const { email } = req.query;
+  const queries = req.query;
 
   try {
     const event = await Event.findById(eventId);
-
     if (!event) {
       throw HttpError(404, "Event not found");
     }
 
     const participant = await EventRegistration.findOne({
       event_id: eventId,
-      email,
+      ...queries,
     });
-
-    if (!participant) {
-      res.status(404).json({ message: "Participant not found for this event" });
-      return;
-    }
-
-    res.json(participant);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-const findParticipantByFullNameForEvent = async (req, res) => {
-  const { eventId } = req.params;
-  const { fullName } = req.query;
-
-  try {
-    const event = await Event.findById(eventId);
-
-    if (!event) {
-      throw HttpError(404, "Event not found");
-    }
-
-    const participant = await EventRegistration.findOne({
-      event_id: eventId,
-      full_name: fullName,
-    });
-
     if (!participant) {
       res.status(404).json({ message: "Participant not found for this event" });
       return;
@@ -186,6 +157,5 @@ module.exports = {
   deleteEventById,
   registerForEvent,
   getEventMembers,
-  findParticipantByEmailForEvent,
-  findParticipantByFullNameForEvent,
+  findParticipantForEvent,
 };

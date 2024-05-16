@@ -3,17 +3,19 @@ const express = require("express");
 const router = express.Router();
 const ctrl = require("../../controllers/events");
 const { authenticate } = require("../../middlewares");
-const {findParticipantByEmailForEvent, findParticipantByFullNameForEvent} = require("../../controllers/events");
+const { findParticipantForEvent } = require("../../controllers/events");
 
-router.post("/", ctrl.getAllEvents);
+// GET
 router.get("/:id", ctrl.getEventById);
 router.get("/:id/members", ctrl.getEventMembers);
+router.post("/:eventId/participant", findParticipantForEvent);
+// POST
+router.post("/", ctrl.getAllEvents);
 router.post("/create", authenticate, ctrl.createEvent);
-router.patch("/:id", ctrl.updateEventById);
-router.delete("/:id", ctrl.deleteEventById);
 router.post("/:id/register", ctrl.registerForEvent);
-router.get('/:eventId/participants/email', findParticipantByEmailForEvent);
-router.get('/:eventId/participants/fullname', findParticipantByFullNameForEvent);
-
+// PATCH
+router.patch("/:id", ctrl.updateEventById);
+// DELETE
+router.delete("/:id", ctrl.deleteEventById);
 
 module.exports = router;

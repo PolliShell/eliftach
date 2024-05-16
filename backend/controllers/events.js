@@ -4,12 +4,12 @@ const { EventRegistration } = require("../models/eventRegistration");
 const { HttpError } = require("../helpers");
 
 const getAllEvents = async (req, res) => {
-  const { sortParams } = req.body;
+  const sortParams = { ...req.body?.sortParams };
   const { page = 1, pageSize = 10 } = req.query;
   const skip = (page - 1) * pageSize;
 
   try {
-    const mappedSortParams = {
+    const mappedSortParams = sortParams ?? {
       title: sortParams.title === "asc" ? 1 : -1,
       organizer: sortParams.organizer === "asc" ? 1 : -1,
       event_date: sortParams.event_date === "asc" ? 1 : -1,

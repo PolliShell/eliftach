@@ -43,13 +43,13 @@ const EventsList = () => {
     }
   };
 
-  const handleRegister = (eventId) => {
-    return navigate(`/event-registation/${eventId}`);
+  const handleRegister = (event) => {
+    return navigate(`/event-registation/${event._id}`, { state: { event } });
   };
 
-  const handleViewDetails = (eventId) => {
+  const handleViewDetails = (event) => {
     // Логика для просмотра деталей события
-    console.log(`View details for event ${eventId}`);
+    console.log(`View details for event ${event}`);
   };
 
   return (
@@ -62,10 +62,8 @@ const EventsList = () => {
               <h3>{event.title}</h3>
               <p>{event.description}</p>
               <p>Дата: {event.event_date.slice(0, 10)}</p>
-              <button onClick={() => handleRegister(event._id)}>
-                Register
-              </button>
-              <button onClick={() => handleViewDetails(event._id)}>
+              <button onClick={() => handleRegister(event)}>Register</button>
+              <button onClick={() => handleViewDetails(event)}>
                 View Details
               </button>
             </li>

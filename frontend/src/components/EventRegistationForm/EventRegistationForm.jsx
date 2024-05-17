@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import Header from "../Header/Header";
+import styles from "../FormStyles/FormStyles.module.css";
 
-const EventRegistationForm = () => {
+const EventRegistrationForm = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -23,79 +24,78 @@ const EventRegistationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/login", {
-        ...formData,
+      const response = await axios.post("http://localhost:3000/api/events/:id/register", {
+        event_id: state.event._id,
+        user_fullname: formData.full_name,
+        user_email: formData.email,
+        user_birth_date: formData.birth_date,
+        referral_source: formData.referral_source,
       });
 
-      if (res.data.loggedIn) {
-        await fetch(
-          "http://localhost:3001/events/add-event",
-          { method: "POST" },
-          formData,
-          {
-            withCredentials: true, // Передаем куки для аутентификации
-          }
-        );
-        alert("Event added successfully!");
+      if (response.status === 201) {
+        alert("Registered successfully!");
+        navigate("/");
       } else {
-        window.location.href = "/login";
+        alert("Failed to register for the event.");
       }
     } catch (error) {
-      console.error("Failed to add event:", error);
-      alert("Failed to add event");
+      console.error("Failed to register for the event:", error);
+      alert("Failed to register for the event.");
     }
   };
 
   return (
-    <>
-      <Header />
-      <div>
-        <h1>Registation on event</h1>
+      <div className={styles.formContainer}>
+        <h1>Registration for Event</h1>
         <h3>{state.event.title}</h3>
         <form onSubmit={handleSubmit}>
           <label htmlFor="full_name">Fullname:</label>
           <input
-            type="text"
-            id="full_name"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
-            required
+              type="text"
+              id="full_name"
+              name="full_name"
+              value={formData.full_name}
+              onChange={handleChange}
+              className={styles.inputField}
+              required
           />
 
           <label htmlFor="email">Email:</label>
-          <textarea
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
+          <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={styles.inputField}
+              required
           />
 
-          <label htmlFor="birth_date">Date of birth:</label>
+          <label htmlFor="birth_date">Date of Birth:</label>
           <input
-            type="date"
-            id="birth_date"
-            name="birth_date"
-            value={formData.birth_date}
-            onChange={handleChange}
-            required
+              type="date"
+              id="birth_date"
+              name="birth_date"
+              value={formData.birth_date}
+              onChange={handleChange}
+              className={styles.inputField}
+              required
           />
 
           <label htmlFor="referral_source">Referral Source:</label>
           <input
-            type="text"
-            id="referral_source"
-            name="referral_source"
-            value={formData.referral_source}
-            onChange={handleChange}
+              type="text"
+              id="referral_source"
+              name="referral_source"
+              value={formData.referral_source}
+              onChange={handleChange}
+              className={styles.inputField}
           />
 
-          <button type="submit">Submit</button>
+          <button type="submit" className={styles.submitButton}>Submit</button>
         </form>
       </div>
-    </>
   );
 };
 
-export default EventRegistationForm;
+export default EventRegistrationForm;

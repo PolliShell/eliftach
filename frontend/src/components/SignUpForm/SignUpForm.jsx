@@ -1,36 +1,29 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Header from "../Header/Header";
-import "../FormStyles/FormStyles.module.css";
+import styles from "../FormStyles/FormStyles.module.css";
+import { useNavigate } from "react-router-dom";
 
-const SignUpForm = () => {
-  const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    password: "",
-    birth_date: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+const SignupForm = () => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/register", {
-        ...formData,
+      const response = await axios.post("http://localhost:3000/api/auth/register", {
+        full_name: fullName,
+        email: email,
+        birth_date: birthDate,
+        password: password,
       });
-
-      if (res.data.token) {
-        console.log("Signed up successfully!");
-        // redirect to events page
+      if (response.data.loggedIn) {
+        alert("Registered successfully!");
+        navigate("/");
       } else {
-        console.log("Signup failed");
+        console.log("Signup failed:", response.data.status);
       }
     } catch (error) {
       console.error("Error during signup:", error);
@@ -38,43 +31,48 @@ const SignUpForm = () => {
   };
 
   return (
-    <>
-      <Header />
-      <div className="form-container">
+      <div className={styles.formContainer}>
         <form onSubmit={handleSignup}>
           <input
-            type="text"
-            placeholder="Full Name"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className={styles.inputField}
+              required
           />
           <input
-            type="text"
-            placeholder="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={styles.inputField}
+              required
+          />
+          <label htmlFor="birth_date">Date of Birth:</label>
+          <input
+              type="date"
+              id="birth_date"
+              name="birth_date"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className={styles.inputField}
+              required
           />
           <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.inputField}
+              required
           />
-          <input
-            type="Date"
-            placeholder="Birth Date"
-            name="birth_date"
-            value={formData.birth_date}
-            onChange={handleChange}
-          />
-          <button type="submit">Signup</button>
+          <button type="submit" className={styles.submitButton}>
+            Signup
+          </button>
         </form>
       </div>
-    </>
   );
 };
 
-export default SignUpForm;
+export default SignupForm;

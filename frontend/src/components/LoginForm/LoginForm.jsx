@@ -1,36 +1,24 @@
-// LoginForm.js
 import React, { useState } from "react";
 import axios from "axios";
-import "../FormStyles/FormStyles.module.css";
-import Header from "../Header/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
+import styles from "../FormStyles/FormStyles.module.css"; // Правильный импорт CSS модуля
 
 const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    console.log([name, value]);
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+  const navigate = useNavigate(); // Инициализируем useNavigate
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/login", {
-        ...formData,
-      });
-
-      if (res.data.token) {
+      const response = await axios.post(
+          "http://localhost:3000/api/auth/login",
+          { username, password }
+      );
+      if (response.data.token) {
         console.log("Logged in successfully!");
+        navigate("/"); // Перенаправление на главную страницу
       } else {
         setError("Login failed. Please check your credentials.");
       }
@@ -40,36 +28,27 @@ const LoginForm = () => {
     }
   };
 
-  const redirectToRegisterForm = () => {
-    return navigate("/register");
-  };
-
   return (
-    <>
-      <Header />
-      <div className="form-container">
-        {error && <div className="error">{error}</div>}
+      <div className={styles.formContainer}>
+        {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleLogin}>
           <input
-            type="text"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={styles.inputField}
           />
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.inputField}
           />
-          <button type="submit">Login</button>
-          <span>or</span>
-          <button onClick={redirectToRegisterForm}>Register</button>
+          <button type="submit" className={styles.submitButton}>Login</button>
         </form>
       </div>
-    </>
   );
 };
 

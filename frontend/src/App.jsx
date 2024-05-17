@@ -1,31 +1,26 @@
 import React from "react";
-import {BrowserRouter, NavLink, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import EventsList from "./components/EventsList/EventsList";
-import EventRegistationForm from "./components/EventRegistationForm/EventRegistationForm";
-import LoginForm from "./components/LoginForm/LoginForm";
+import EventRegistrationForm from "./components/EventRegistationForm/EventRegistationForm";
 import SignUpForm from "./components/SignUpForm/SignUpForm";
+import LoginForm from "./components/LoginForm/LoginForm";
 import Navbar from "./components/Navbar/Navbar";
-// import AddEventForm from "./components/AddEventForm/AddEventForm";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app-wrapper">
-        <div className="app-wrapper-content">
-          <Navbar/>
-          <Routes>
-            <Route path="/" element={<EventsList />} />
-            <Route
-              path="/event-registation/:id"
-              element={<EventRegistationForm />}
-            />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<SignUpForm />} />
-            {/*<Route path="/dialogs/*" element={<Dialogs state={props.state.dialogsPage}/>}/>*/}
-          </Routes>
+      <BrowserRouter>
+        <div className="app-wrapper">
+          <Navbar />
+          <div className="app-wrapper-content">
+            <Routes>
+              <Route path="/" element={<EventsList />} />
+              <Route path="/event-registration/:id" element={<EventRegistrationForm />} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/signup" element={<SignUpForm />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
   );
 }
 
